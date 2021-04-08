@@ -1,0 +1,10 @@
+.inputGroup, .toxicIcon{
+  /* animation: appear 2s ease-in forwards; */
+  /* transition: opacity 2s cubic-bezier(0.19, 1, 0.22, 1); */
+}
+
+@keyframes appear {
+  from { opacity: 0;}
+  to { opacity: 1;}
+    
+}

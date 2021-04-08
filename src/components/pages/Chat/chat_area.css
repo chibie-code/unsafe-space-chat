@@ -1,0 +1,8 @@
+#scrollBtn{
+  background-color: #e62739;
+
+}
+#scrollBtn:active{
+  /* background-color: #cc2233; */
+  background-color: lime;
+}
