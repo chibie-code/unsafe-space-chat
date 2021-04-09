@@ -1,53 +1,57 @@
-import React from 'react';
-import { Input, InputGroup, Icon, Button, List  } from 'rsuite';
-import { ScrollArea  } from "react-scroll-to";
-import Draggable from 'react-draggable';
+import React, { useRef, useEffect } from 'react';
+import { Input, InputGroup, Icon, List  } from 'rsuite';
+// import { ScrollArea  } from "react-scroll-to";
+// import Draggable from 'react-draggable';
 import "./chat_area.css";
-// import produce from "immer";
+import produce from "immer";
 
-const ChatArea = ({ usr, setUsr, uid, messagesDB, msg, setMsg, msgs, loadMessages, sendMessage, scroll, color }) => {
+const ChatArea = ({ setTarget, usr, setUsr, uid, messagesDB, msg, setMsg, msgs, loadMessages, sendMessage, color }) => {
 
-  const runScroll = () => {
-    scroll({ 
-      id: "messages", 
-      y: 10000,
-      smooth: true })
-  }
+  const scrollAreaRef = useRef(null);
 
-  const messageBubble = (uID, id, message_, color) => {
+  const messageBubble = (id, message_, color) => {
 
-    if(uID === message_.id){
-      return (
-        <>
-          <span style={{color, fontWeight: "700", backgroundColor: color}}>
-            "[YOU]"
+    const pos = (id === message_.uid)?"flex-end":"flex-start";
+    const name = (id === message_.uid)?"":`${message_.name}: `;
+
+    return (
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: pos
+      }}>
+        <span style={{ color: "darkgray", fontWeight: "700" }}>
+          {name}
+          <span style={{ color: "white"}}>
+          {message_.message}
           </span>
-            : {message_.message}
-        </>
-      );
-    }
-    else{
-        return (
-          <>
-            <span style={{ fontWeight: "700"}}>
-              {message_.name}
-            </span>
-              : {message_.message}
-          </>
-          );
-    }
+        </span>
+      </div>
+    );
   };
+
+  useEffect(()=>{
+    if(scrollAreaRef.current){
+      setTarget(p=>
+      produce(p,d=>{
+        d=scrollAreaRef.current;
+        return d;
+      }))
+    }
+  },[scrollAreaRef, setTarget]);
 
   const styles = {
       container: {
         width: "100%",
-        height: "100%"
+        height: "90vh"
       },
       messages: {
+        position: "relative",
         display: "flex",
         flexDirection: "column",
-        width: "auto",
-        height: "93vh"
+        width: "100%",
+        height: "82vh",
+        overflow: "hidden"
       },
       messagesScroll: {
         position: "relative",
@@ -56,38 +60,36 @@ const ChatArea = ({ usr, setUsr, uid, messagesDB, msg, setMsg, msgs, loadMessage
         height: "100%",
         maxWidth: "100%",
         display: "flex",
-        justifyContent: "",
+        justifyContent: "start",
         flexDirection: "column"
       },
       scrollBtn: {
         position: "fixed",
-        top: "75%",
-        left: "95%",
+        top: "10rem",
+        left: "10rem",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
         textAlign: "center",
-        fontSize: "50rem",
+        fontSize: "1rem",
         width: "2rem",
         height: "2rem",
         padding: "1rem",
         color: "cyan",
-        // background: "rgba(200, 30, 10, 0.5)",
+        background: "rgba(200, 200, 200, 0.2)",
         borderRadius: "50%"
       },
       message:{
         width: "100%",
         height: "auto",
-        padding: "1rem",
-        borderRadius: "3px",
-        color: "black"
+        borderRadius: "3px"
       },
       inputArea: {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
         width: "100%",
-        border: "cyan",
+        height: "8vh",
         marginTop: "auto",
         padding: "1rem"
       },
@@ -99,65 +101,53 @@ const ChatArea = ({ usr, setUsr, uid, messagesDB, msg, setMsg, msgs, loadMessage
   return (
     <div style={styles.container}>
       <div style={styles.messages}>
-
-        <ScrollArea
-          id="messages" style={styles.messagesScroll}>
-          <List size="lg" bordered>
-          {
-            msgs.map((msg_, id)=>{
-              return (
-                <List.Item key={id}>
-                  {messageBubble(uid, id, msg_, color)}
-                </List.Item>
-                );
-              }
-            )
-          }
-          </List>
-          <Draggable>
-            <Button 
-            id="scrollBtn"
-            style={styles.scrollBtn}
-            onClick={runScroll}>
-              {/*<Icon 
-                style={styles.showUsersIcon}
-                icon="arrow-down"/>*/}
-              <i 
-              style={styles.showUsersIcon}
-              className="fas fa-angle-double-down"></i>
-            </Button>
-          </Draggable>
-        </ScrollArea>
-
-        <div style={styles.inputArea}> 
-          <InputGroup inside>
-            <Input
-            onKeyDown={(e)=>{
-              if(e.key === "Enter"){
-                
-                sendMessage();
-                loadMessages();
-                setMsg("");
-                e.target.value = "";
-              }
-            }}
-            onChange={(text)=>{
-              // console.log("text.toString",text);
-              setMsg(p=>text);
-            }}/>
-            <InputGroup.Button
-              onClick={()=>{
-              //  console.log("Send message:",msg);
+        <List size="lg" bordered style={{width: "100%", height: "100%"}}>
+          <div style={styles.messagesScroll}
+          ref={ scrollAreaRef }>
+            {
+              msgs.map((msg_, id)=>{
+                return (
+                  <List.Item key={id} style={styles.message}>
+                    {messageBubble(usr.uID, msg_, color)}
+                  </List.Item>
+                  );
+                }
+              )
+            }
+          </div>
+        </List>
+        {/*<Draggable>
+          <div style={styles.scrollBtn}>draggable</div>
+        </Draggable>*/}
+      </div>
+      <div style={styles.inputArea}> 
+        <InputGroup inside>
+          <Input
+          onKeyDown={(e)=>{
+            if(e.key === "Enter"){
+              
               sendMessage();
+              loadMessages();
+              // scroll();
               setMsg("");
-              return;
-            }}>
-              <Icon 
-              style={styles.showUsersIcon}
-              icon="send"/>
-            </InputGroup.Button>
-          </InputGroup>
-        </div>
+              e.target.value = "";
+            }
+          }}
+          onChange={(text)=>{
+            // console.log("text.toString",text);
+            setMsg(p=>text);
+          }}/>
+          <InputGroup.Button
+            onClick={()=>{
+            //  console.log("Send message:",msg);
+            sendMessage();
+            return;
+          }}>
+            <Icon 
+            style={styles.showUsersIcon}
+            icon="send"/>
+          </InputGroup.Button>
+        </InputGroup>
       </div>
     </div>
   );

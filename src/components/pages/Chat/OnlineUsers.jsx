@@ -2,7 +2,8 @@ import React from 'react';
 import { List, Icon, Avatar } from 'rsuite';
 import 'firebase/database';
 
-const OnlineUsers = ({ listOnlineUsers, setUsersList, usersList, show, color }) => {
+
+const OnlineUsers = ({ listOnlineUsers, setUsersList, usersList, show, color, usr }) => {
 
   const styles = {
     container: {
@@ -33,9 +34,15 @@ const OnlineUsers = ({ listOnlineUsers, setUsersList, usersList, show, color }) 
                       size="xs">
                         <Icon 
                         icon="user"
-                        style={{color: user.color}} />
+                        style={{color: user.color.primary}} />
                       </Avatar>
-                       {` ${user.name}`}
+                      <span style={{
+                        color: "white"
+                        }}>
+                       {` ${user.name} ${
+                         (usr.name === user.displayName)?
+                         "[me]":""}`}
+                      </span>
                     </span>
                   </List.Item>
                   );

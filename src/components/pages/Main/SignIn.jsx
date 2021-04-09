@@ -5,7 +5,7 @@ import React from 'react';
 // import { Link } from 'react-router-dom';
 import Chatroom from '../Chat';
 
-const SignIn = ({ isSignedIn, firebase, usr, updateDatabase, setUsr, logUserSignout, usersList, messagesDB, msg, setMsg, msgs, listOnlineUsers, sendMessage, loadMessages, setColor, color }) => {
+const SignIn = ({ setTarget, isSignedIn, firebase, usr, updateDatabase, setUsr, logUserSignout, usersList, messagesDB, msg, setMsg, msgs, listOnlineUsers, sendMessage, loadMessages, setColor, color }) => {
 
   const show = (isSignedIn)?"flex":"none";
 
@@ -22,6 +22,7 @@ const SignIn = ({ isSignedIn, firebase, usr, updateDatabase, setUsr, logUserSign
   return(
     <div style={styles.chatRoomComponent}>
       <Chatroom
+      setTarget={setTarget}
       isSignedIn={isSignedIn}
       firebase={firebase}
       usr={usr}
